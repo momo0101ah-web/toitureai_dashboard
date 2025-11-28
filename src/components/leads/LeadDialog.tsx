@@ -172,6 +172,20 @@ export const LeadDialog = ({ open, onOpenChange, lead }: LeadDialogProps) => {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="budget_negocie">💰 Budget Négocié (€ HT)</Label>
+              <Input
+                id="budget_negocie"
+                type="number"
+                step="0.01"
+                placeholder="Optionnel - remplace le calcul IA"
+                {...register('budget_negocie', { valueAsNumber: true })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Si rempli, ce montant sera utilisé au lieu du calcul automatique
+              </p>
+            </div>
+
             <div className="space-y-2 col-span-2">
               <Label htmlFor="description">Description</Label>
               <Textarea id="description" {...register('description')} rows={3} />

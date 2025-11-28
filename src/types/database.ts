@@ -35,6 +35,7 @@ export interface Lead {
   ai_raw: string | null;
   score_qualification: number | null;
   budget_estime: number | null;
+  budget_negocie: number | null;
   delai: string | null;
   urgence: string | null;
   created_at: string;
