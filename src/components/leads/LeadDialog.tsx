@@ -22,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DevisLinesForm, DevisLine } from './DevisLinesForm';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface LeadDialogProps {
   open: boolean;
@@ -47,13 +49,20 @@ export const LeadDialog = ({ open, onOpenChange, lead }: LeadDialogProps) => {
 
   const statut = watch('statut');
 
+  const [customLines, setCustomLines] = useState<DevisLine[]>([]);
+  const [customNotes, setCustomNotes] = useState<string>('');
+
   useEffect(() => {
     if (lead) {
       reset(lead);
+      setCustomLines(lead.lignes_devis_custom || []);
+      setCustomNotes(lead.notes_devis_custom || '');
     } else {
       reset({
         statut: 'nouveau',
       });
+      setCustomLines([]);
+      setCustomNotes('');
     }
   }, [lead, reset]);
 
@@ -82,7 +91,12 @@ export const LeadDialog = ({ open, onOpenChange, lead }: LeadDialogProps) => {
   });
 
   const onSubmit = (data: Partial<Lead>) => {
-    mutation.mutate(data);
+    const dataToSend = {
+      ...data,
+      lignes_devis_custom: customLines.length > 0 ? customLines : null,
+      notes_devis_custom: customNotes.trim() || null,
+    };
+    mutation.mutate(dataToSend);
   };
 
   return (
@@ -96,101 +110,119 @@ export const LeadDialog = ({ open, onOpenChange, lead }: LeadDialogProps) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nom">Nom *</Label>
-              <Input id="nom" {...register('nom')} required />
-            </div>
+          <Tabs defaultValue="infos" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="infos">Informations Lead</TabsTrigger>
+              <TabsTrigger value="devis">Lignes Devis Custom</TabsTrigger>
+            </TabsList>
 
-            <div className="space-y-2">
-              <Label htmlFor="prenom">Prénom</Label>
-              <Input id="prenom" {...register('prenom')} />
-            </div>
+            <TabsContent value="infos" className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nom">Nom *</Label>
+                  <Input id="nom" {...register('nom')} required />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...register('email')} />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="prenom">Prénom</Label>
+                  <Input id="prenom" {...register('prenom')} />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="telephone">Téléphone</Label>
-              <Input id="telephone" {...register('telephone')} />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" {...register('email')} />
+                </div>
 
-            <div className="space-y-2 col-span-2">
-              <Label htmlFor="adresse">Adresse</Label>
-              <Input id="adresse" {...register('adresse')} />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="telephone">Téléphone</Label>
+                  <Input id="telephone" {...register('telephone')} />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="code_postal">Code postal</Label>
-              <Input id="code_postal" {...register('code_postal')} />
-            </div>
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="adresse">Adresse</Label>
+                  <Input id="adresse" {...register('adresse')} />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="ville">Ville</Label>
-              <Input id="ville" {...register('ville')} />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="code_postal">Code postal</Label>
+                  <Input id="code_postal" {...register('code_postal')} />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="source">Source</Label>
-              <Input id="source" {...register('source')} placeholder="Site web, téléphone, etc." />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ville">Ville</Label>
+                  <Input id="ville" {...register('ville')} />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="statut">Statut *</Label>
-              <Select value={statut} onValueChange={(value) => setValue('statut', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez un statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="source">Source</Label>
+                  <Input id="source" {...register('source')} placeholder="Site web, téléphone, etc." />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="type_projet">Type de projet</Label>
-              <Input
-                id="type_projet"
-                {...register('type_projet')}
-                placeholder="Rénovation toiture, etc."
+                <div className="space-y-2">
+                  <Label htmlFor="statut">Statut *</Label>
+                  <Select value={statut} onValueChange={(value) => setValue('statut', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez un statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="type_projet">Type de projet</Label>
+                  <Input
+                    id="type_projet"
+                    {...register('type_projet')}
+                    placeholder="Rénovation toiture, etc."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="surface">Surface (m²)</Label>
+                  <Input
+                    id="surface"
+                    type="number"
+                    step="0.01"
+                    {...register('surface', { valueAsNumber: true })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="budget_negocie">💰 Budget Négocié (€ HT)</Label>
+                  <Input
+                    id="budget_negocie"
+                    type="number"
+                    step="0.01"
+                    placeholder="Optionnel - remplace le calcul IA"
+                    {...register('budget_negocie', { valueAsNumber: true })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Si rempli, ce montant sera utilisé au lieu du calcul automatique
+                  </p>
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea id="description" {...register('description')} rows={3} />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="devis" className="space-y-4 mt-4">
+              <DevisLinesForm
+                value={customLines}
+                onChange={setCustomLines}
+                notes={customNotes}
+                onNotesChange={setCustomNotes}
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="surface">Surface (m²)</Label>
-              <Input
-                id="surface"
-                type="number"
-                step="0.01"
-                {...register('surface', { valueAsNumber: true })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="budget_negocie">💰 Budget Négocié (€ HT)</Label>
-              <Input
-                id="budget_negocie"
-                type="number"
-                step="0.01"
-                placeholder="Optionnel - remplace le calcul IA"
-                {...register('budget_negocie', { valueAsNumber: true })}
-              />
-              <p className="text-xs text-muted-foreground">
-                Si rempli, ce montant sera utilisé au lieu du calcul automatique
-              </p>
-            </div>
-
-            <div className="space-y-2 col-span-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea id="description" {...register('description')} rows={3} />
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
 
           <div className="flex gap-2 justify-end">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

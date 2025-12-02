@@ -38,6 +38,26 @@ export interface Lead {
   budget_negocie: number | null;
   delai: string | null;
   urgence: string | null;
+  // Email tracking (SendGrid)
+  email_ouvert: boolean | null;
+  email_ouvert_count: number | null;
+  email_ouvert_at: string | null;
+  email_delivered_at: string | null;
+  email_clic_count: number | null;
+  email_clic_at: string | null;
+  pdf_consulte: boolean | null;
+  pdf_consulte_at: string | null;
+  engagement_score: number | null;
+  derniere_activite: string | null;
+  sendgrid_message_id: string | null;
+  // Custom devis lines (manual entry after phone call)
+  lignes_devis_custom: Array<{
+    designation: string;
+    quantite: number;
+    unite: string;
+    prix_unitaire_ht: number;
+  }> | null;
+  notes_devis_custom: string | null;
   created_at: string;
   updated_at: string;
 }
