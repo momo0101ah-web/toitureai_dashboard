@@ -97,40 +97,18 @@ export default function UsersPage() {
       if (authError) throw authError;
       if (!authData.user) throw new Error('Utilisateur non créé');
 
-      // 2. Attendre que le profil soit créé par le trigger (polling)
-      let profileExists = false;
-      let attempts = 0;
-      const maxAttempts = 10;
+      // 2. Créer le profil
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: authData.user.id,
+          email: newUserEmail,
+          full_name: newUserFullName,
+        });
 
-      while (!profileExists && attempts < maxAttempts) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', authData.user.id)
-          .single();
+      if (profileError) throw profileError;
 
-        if (profile) {
-          profileExists = true;
-        } else {
-          // Attendre 500ms avant de réessayer
-          await new Promise(resolve => setTimeout(resolve, 500));
-          attempts++;
-        }
-      }
-
-      if (!profileExists) {
-        throw new Error('Le profil n\'a pas été créé automatiquement');
-      }
-
-      // 3. Mettre à jour le profil avec le nom complet si nécessaire
-      if (newUserFullName) {
-        await supabase
-          .from('profiles')
-          .update({ full_name: newUserFullName })
-          .eq('id', authData.user.id);
-      }
-
-      // 4. Assigner le rôle (maintenant que le profil existe)
+      // 3. Assigner le rôle
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
@@ -384,7 +362,7 @@ export default function UsersPage() {
               </Button>
               <Button
                 onClick={() => createUserMutation.mutate()}
-                disabled={!newUserEmail || !newUserPassword || newUserPassword.length < 6 || createUserMutation.isPending}
+                disabled={!newUserEmail || !newUserPassword || newUserPassword.length < 6}
               >
                 {createUserMutation.isPending ? 'Création...' : 'Créer'}
               </Button>
