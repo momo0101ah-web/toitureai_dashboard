@@ -97,18 +97,19 @@ export default function UsersPage() {
       if (authError) throw authError;
       if (!authData.user) throw new Error('Utilisateur non créé');
 
-      // 2. Créer le profil
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          email: newUserEmail,
-          full_name: newUserFullName,
-        });
+      // 2. Le profil est créé automatiquement par le trigger Supabase
+      // Attendre un peu pour laisser le trigger s'exécuter
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (profileError) throw profileError;
+      // 3. Mettre à jour le profil avec le nom complet si nécessaire
+      if (newUserFullName) {
+        await supabase
+          .from('profiles')
+          .update({ full_name: newUserFullName })
+          .eq('id', authData.user.id);
+      }
 
-      // 3. Assigner le rôle
+      // 4. Assigner le rôle
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
@@ -362,7 +363,7 @@ export default function UsersPage() {
               </Button>
               <Button
                 onClick={() => createUserMutation.mutate()}
-                disabled={!newUserEmail || !newUserPassword || newUserPassword.length < 6}
+                disabled={!newUserEmail || !newUserPassword || newUserPassword.length < 6 || createUserMutation.isPending}
               >
                 {createUserMutation.isPending ? 'Création...' : 'Créer'}
               </Button>
