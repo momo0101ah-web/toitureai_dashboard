@@ -97,9 +97,30 @@ export default function UsersPage() {
       if (authError) throw authError;
       if (!authData.user) throw new Error('Utilisateur non créé');
 
-      // 2. Le profil est créé automatiquement par le trigger Supabase
-      // Attendre un peu pour laisser le trigger s'exécuter
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 2. Attendre que le profil soit créé par le trigger (polling)
+      let profileExists = false;
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      while (!profileExists && attempts < maxAttempts) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (profile) {
+          profileExists = true;
+        } else {
+          // Attendre 500ms avant de réessayer
+          await new Promise(resolve => setTimeout(resolve, 500));
+          attempts++;
+        }
+      }
+
+      if (!profileExists) {
+        throw new Error('Le profil n\'a pas été créé automatiquement');
+      }
 
       // 3. Mettre à jour le profil avec le nom complet si nécessaire
       if (newUserFullName) {
@@ -109,7 +130,7 @@ export default function UsersPage() {
           .eq('id', authData.user.id);
       }
 
-      // 4. Assigner le rôle
+      // 4. Assigner le rôle (maintenant que le profil existe)
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
