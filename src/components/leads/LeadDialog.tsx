@@ -194,6 +194,20 @@ export const LeadDialog = ({ open, onOpenChange, lead }: LeadDialogProps) => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="budget_estime">Budget estimé (€)</Label>
+                  <Input
+                    id="budget_estime"
+                    type="number"
+                    step="0.01"
+                    placeholder="Budget indiqué par le client"
+                    {...register('budget_estime', { valueAsNumber: true })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Budget estimé par le client dans le formulaire
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="budget_negocie">💰 Budget Négocié (€ HT)</Label>
                   <Input
                     id="budget_negocie"
