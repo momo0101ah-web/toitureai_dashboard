@@ -8,10 +8,11 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const statusColors = {
-  'brouillon': 'secondary',
+  'signe': 'default',
   'envoye': 'default',
   'accepte': 'default',
   'refuse': 'destructive',
+  'payes': 'default',
 } as const;
 
 export const LatestDevisList = () => {
