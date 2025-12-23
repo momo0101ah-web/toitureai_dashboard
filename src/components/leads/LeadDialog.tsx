@@ -39,6 +39,7 @@ const statusOptions = [
   'accepte',
   'refuse',
   'perdu',
+  'chaud',
 ];
 
 export const LeadDialog = ({ open, onOpenChange, lead }: LeadDialogProps) => {
