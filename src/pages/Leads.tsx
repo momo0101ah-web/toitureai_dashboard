@@ -91,14 +91,36 @@ export default function LeadsPage() {
   const handleSendDevis = async (lead: Lead) => {
     try {
       toast.loading('Envoi du devis en cours...');
-      
+
+      // 1. Créer le devis dans Supabase avec TOUTES les informations client
+      const { data: newDevis, error: devisError } = await supabase
+        .from('devis')
+        .insert([{
+          lead_id: lead.id,
+          client_nom: `${lead.nom} ${lead.prenom || ''}`.trim(),
+          client_email: lead.email || '',
+          client_telephone: lead.telephone || '',
+          client_adresse: lead.adresse || '',
+          statut: 'envoye',
+          montant_ht: 0,
+          montant_ttc: 0,
+          tva_pct: 10,
+          numero: '', // Le trigger génère le numéro automatiquement
+        }])
+        .select()
+        .single();
+
+      if (devisError) throw devisError;
+
+      // 2. Appeler le webhook N8N pour les actions supplémentaires (génération PDF, envoi email, etc.)
       const response = await fetch('https://mohamed-proyecto-n8n.3ffj7o.easypanel.host/webhook/c5a970fd-d45d-445b-816d-45c4817806d5', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'X-Webhook-Secret': '4ec2a273-089b-48a2-bfbc-e7fe8ac86bda'
         },
         body: JSON.stringify({
+          devis_id: newDevis.id,
           lead_id: lead.id,
           nom: lead.nom,
           prenom: lead.prenom,
@@ -110,9 +132,11 @@ export default function LeadsPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Erreur lors de l\'envoi du devis');
-      
-      // Mettre à jour le statut du lead à "devis_envoye"
+      if (!response.ok) {
+        console.warn('Webhook N8N a échoué, mais le devis a été créé');
+      }
+
+      // 3. Mettre à jour le statut du lead à "devis_envoye"
       const { error } = await supabase
         .from('leads')
         .update({ statut: 'devis_envoye' })
@@ -121,15 +145,17 @@ export default function LeadsPage() {
       if (error) {
         console.error('Error updating lead status:', error);
         toast.dismiss();
-        toast.error('Devis Envoyé mais erreur lors de la mise à jour du statut');
+        toast.error('Devis créé mais erreur lors de la mise à jour du statut');
       } else {
         queryClient.invalidateQueries({ queryKey: ['leads'] });
+        queryClient.invalidateQueries({ queryKey: ['devis'] });
+        queryClient.invalidateQueries({ queryKey: ['latestDevisList'] });
         toast.dismiss();
-        toast.success('Devis Envoyé et statut mis à jour');
+        toast.success('Devis créé et envoyé avec succès');
       }
     } catch (error) {
       toast.dismiss();
-      toast.error('Erreur lors de l\'envoi du devis');
+      toast.error('Erreur lors de la création du devis');
       console.error('Erreur:', error);
     }
   };
