@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { DevisDialog } from '@/components/devis/DevisDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -23,13 +24,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const statusColors = {
-  signe: 'default',      // gris clair par défaut, ou tu peux le customiser
-  envoye: 'secondary',   // un peu plus foncé
-  accepte: 'default',    
-  refuse: 'destructive', // rouge, parfait pour refusé
-  payes: 'default',
-} as const;
+
 
 export default function DevisPage() {
   const [search, setSearch] = useState('');
@@ -155,9 +150,25 @@ export default function DevisPage() {
                       {d.numero} • {format(new Date(d.date_creation), 'dd MMM yyyy', { locale: fr })}
                     </p>
                   </div>
-                  <Badge variant={statusColors[d.statut as keyof typeof statusColors] || 'secondary'}>
-                    {d.statut}
-                  </Badge>
+                  <Badge
+  className={cn(
+    "border-transparent text-white font-medium",
+    d.statut === "signe" && "bg-purple-500 hover:bg-purple-600",
+    d.statut === "envoye" && "bg-green-500 hover:bg-green-600",
+    d.statut === "accepte" && "bg-emerald-500 hover:bg-emerald-600",
+    d.statut === "refuse" && "bg-red-500 hover:bg-red-600",
+    d.statut === "payes" && "bg-blue-500 hover:bg-blue-600",
+    // Cas par défaut si un ancien statut bizarre traîne
+    !["signe", "envoye", "accepte", "refuse", "payes"].includes(d.statut) && "bg-gray-500"
+  )}
+>
+  {d.statut === "signe" ? "Signé" :
+   d.statut === "envoye" ? "Envoyé" :
+   d.statut === "accepte" ? "Accepté" :
+   d.statut === "refuse" ? "Refusé" :
+   d.statut === "payes" ? "Payés" :
+   d.statut}
+</Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
