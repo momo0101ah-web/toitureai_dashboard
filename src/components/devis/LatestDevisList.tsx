@@ -6,14 +6,9 @@ import { Button } from '@/components/ui/button';
 import { FileText, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
-const statusColors = {
-  'signe': 'default',
-  'envoye': 'default',
-  'accepte': 'default',
-  'refuse': 'destructive',
-  'payes': 'default',
-} as const;
+
 
 export const LatestDevisList = () => {
   const { data: devis, isLoading } = useQuery({
@@ -71,9 +66,24 @@ export const LatestDevisList = () => {
               </div>
               
               <div className="flex items-center gap-4">
-                <Badge variant={statusColors[d.statut as keyof typeof statusColors] || 'secondary'}>
-                  {d.statut}
-                </Badge>
+                <Badge
+  className={cn(
+    "border-transparent text-white font-medium",
+    d.statut === "signe" && "bg-purple-500 hover:bg-purple-600",
+    d.statut === "envoye" && "bg-green-500 hover:bg-green-600",
+    d.statut === "accepte" && "bg-emerald-500 hover:bg-emerald-600",
+    d.statut === "refuse" && "bg-red-500 hover:bg-red-600",
+    d.statut === "payes" && "bg-blue-500 hover:bg-blue-600",
+    !["signe", "envoye", "accepte", "refuse", "payes"].includes(d.statut) && "bg-gray-500"
+  )}
+>
+  {d.statut === "signe" ? "Signé" :
+   d.statut === "envoye" ? "Envoyé" :
+   d.statut === "accepte" ? "Accepté" :
+   d.statut === "refuse" ? "Refusé" :
+   d.statut === "payes" ? "Payés" :
+   d.statut}
+</Badge>
                 <p className="font-bold">{d.montant_ttc.toLocaleString('fr-FR')} €</p>
                 {d.url_pdf && (
                   <Button variant="outline" size="sm" asChild>
