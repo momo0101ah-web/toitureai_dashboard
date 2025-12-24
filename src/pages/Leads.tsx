@@ -121,11 +121,11 @@ export default function LeadsPage() {
       if (error) {
         console.error('Error updating lead status:', error);
         toast.dismiss();
-        toast.error('Devis envoyé mais erreur lors de la mise à jour du statut');
+        toast.error('Devis Envoyé mais erreur lors de la mise à jour du statut');
       } else {
         queryClient.invalidateQueries({ queryKey: ['leads'] });
         toast.dismiss();
-        toast.success('Devis envoyé et statut mis à jour');
+        toast.success('Devis Envoyé et statut mis à jour');
       }
     } catch (error) {
       toast.dismiss();
