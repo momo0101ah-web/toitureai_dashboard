@@ -11,6 +11,7 @@ import { Plus, Search, Trash2, Edit, FileText, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { LeadDialog } from '@/components/leads/LeadDialog';
 import { cn } from '@/lib/utils';
+import { StatusBadge } from '@/components/ui/StatusBadge';  // ajuste le chemin si besoin
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
