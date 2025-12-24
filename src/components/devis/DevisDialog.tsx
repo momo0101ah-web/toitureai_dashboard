@@ -43,31 +43,33 @@ export const DevisDialog = ({ open, onOpenChange, devis }: DevisDialogProps) => 
     if (leadId && leads) {
       const selectedLead = leads.find((l) => l.id === leadId);
       if (selectedLead) {
-        setValue("client_nom", `${selectedLead.nom} ${selectedLead.prenom || ""}`.trim(), { shouldValidate: true, shouldDirty: true });
-        if (selectedLead.email) setValue("client_email", selectedLead.email, { shouldValidate: true, shouldDirty: true });
-        if (selectedLead.telephone) setValue("client_telephone", selectedLead.telephone, { shouldValidate: true, shouldDirty: true });
-        if (selectedLead.adresse) setValue("client_adresse", selectedLead.adresse, { shouldValidate: true, shouldDirty: true });
+        setValue("client_nom", `${selectedLead.nom} ${selectedLead.prenom || ""}`.trim(), { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setValue("client_email", selectedLead.email || "", { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setValue("client_telephone", selectedLead.telephone || "", { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setValue("client_adresse", selectedLead.adresse || "", { shouldValidate: true, shouldDirty: true, shouldTouch: true });
       }
     }
   }, [leadId, leads, setValue]);
 
   useEffect(() => {
-    if (devis) {
-      reset(devis);
-    } else {
-      reset({
-        statut: "envoye",
-        tva_pct: 10,
-        montant_ht: 0,
-        montant_ttc: 0,
-        client_nom: "",
-        client_email: "",
-        client_telephone: "",
-        client_adresse: "",
-        notes: "",
-      });
+    if (open) {
+      if (devis) {
+        reset(devis);
+      } else {
+        reset({
+          statut: "envoye",
+          tva_pct: 10,
+          montant_ht: 0,
+          montant_ttc: 0,
+          client_nom: "",
+          client_email: "",
+          client_telephone: "",
+          client_adresse: "",
+          notes: "",
+        });
+      }
     }
-  }, [devis, reset]);
+  }, [devis, reset, open]);
 
   useEffect(() => {
     const ttc = montantHt * (1 + tvaPct / 100);
