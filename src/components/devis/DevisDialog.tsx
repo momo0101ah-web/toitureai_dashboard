@@ -81,16 +81,40 @@ export const DevisDialog = ({ open, onOpenChange, devis }: DevisDialogProps) => 
       // Le numéro est généré automatiquement par le trigger de la base de données
 
       if (devis?.id) {
-        const { error } = await supabase.from("devis").update(data).eq("id", devis.id);
+        const { data: updatedDevis, error } = await supabase
+          .from("devis")
+          .update(data)
+          .eq("id", devis.id)
+          .select()
+          .single();
         if (error) throw error;
+        return updatedDevis;
       } else {
         // Passer une chaîne vide pour le numéro, le trigger le générera
-        const { error } = await supabase.from("devis").insert([{ ...data, numero: "" } as any]);
+        const { data: newDevis, error } = await supabase
+          .from("devis")
+          .insert([{ ...data, numero: "" } as any])
+          .select()
+          .single();
         if (error) throw error;
+        return newDevis;
       }
     },
-    onSuccess: () => {
+    onSuccess: (savedDevis) => {
+      // Mettre à jour le cache avec les données fraîches retournées par Supabase
+      queryClient.setQueryData<Devis[]>(["devis"], (old) => {
+        if (!old) return [savedDevis];
+        if (devis?.id) {
+          // Update: remplacer le devis existant
+          return old.map((d) => (d.id === savedDevis.id ? savedDevis : d));
+        } else {
+          // Insert: ajouter en tête de liste
+          return [savedDevis, ...old];
+        }
+      });
+      // Invalider toutes les variantes de la query pour forcer un refetch propre
       queryClient.invalidateQueries({ queryKey: ["devis"] });
+      queryClient.invalidateQueries({ queryKey: ["latestDevisList"] });
       toast.success(devis ? "Devis modifié avec succès" : "Devis créé avec succès");
       onOpenChange(false);
       reset();
