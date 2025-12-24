@@ -166,12 +166,15 @@ export const LeadDialog = ({ open, onOpenChange, lead }: LeadDialogProps) => {
                       <SelectValue placeholder="Sélectionnez un statut" />
                     </SelectTrigger>
                     <SelectContent>
-                      {statusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+  <SelectItem value="nouveau">Nouveau</SelectItem>
+  <SelectItem value="contacte">Contacté</SelectItem>
+  <SelectItem value="qualifie">Qualifié</SelectItem>
+  <SelectItem value="devis_envoye">Devis envoyé</SelectItem>
+  <SelectItem value="accepte">Accepté</SelectItem>
+  <SelectItem value="refuse">Refusé</SelectItem>
+  <SelectItem value="perdu">Perdu</SelectItem>
+  <SelectItem value="chaud">Chaud</SelectItem>
+</SelectContent>
                   </Select>
                 </div>
 
