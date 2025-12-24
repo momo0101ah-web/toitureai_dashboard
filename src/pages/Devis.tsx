@@ -12,6 +12,7 @@ import { fr } from 'date-fns/locale';
 import { DevisDialog } from '@/components/devis/DevisDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { StatusBadge } from '@/components/ui/StatusBadge';  // ajuste le chemin si besoin
 import { toast } from 'sonner';
 import {
   AlertDialog,
