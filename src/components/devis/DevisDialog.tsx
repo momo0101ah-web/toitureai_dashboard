@@ -52,22 +52,26 @@ export const DevisDialog = ({ open, onOpenChange, devis }: DevisDialogProps) => 
   }, [leadId, leads, setValue]);
 
   useEffect(() => {
-  if (devis) {
-    reset(devis);
-  } else {
-    reset({
-      statut: "envoye",
-      tva_pct: 10,
-      montant_ht: 0,
-      montant_ttc: 0,
-      client_nom: "",
-      client_email: "",
-      client_telephone: "",
-      client_adresse: "",
-      notes: "",
-    });
+  if (open) {
+    if (devis) {
+      reset({
+        ...devis,
+      });
+    } else {
+      reset({
+        statut: "envoye",
+        tva_pct: 10,
+        montant_ht: 0,
+        montant_ttc: 0,
+        client_nom: "",
+        client_email: "",
+        client_telephone: "",
+        client_adresse: "",
+        notes: "",
+      });
+    }
   }
-}, [devis, reset]);
+}, [open, devis]);
 
   useEffect(() => {
     const ttc = montantHt * (1 + tvaPct / 100);
