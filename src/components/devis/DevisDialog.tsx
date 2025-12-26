@@ -17,13 +17,7 @@ interface DevisDialogProps {
   devis?: Devis | null;
 }
 
- const statusOptions = [
-    { value: "signe", label: "Signé" },
-    { value: "envoye", label: "Envoyé" },
-    { value: "accepte", label: "Accepté" },
-    { value: "refuse", label: "Refusé" },
-    { value: "payes", label: "Payés" },
-  ];
+ 
 
 export const DevisDialog = ({ open, onOpenChange, devis }: DevisDialogProps) => {
   const queryClient = useQueryClient();
