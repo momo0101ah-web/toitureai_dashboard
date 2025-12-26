@@ -164,14 +164,14 @@ export const DevisDialog = ({ open, onOpenChange, devis }: DevisDialogProps) => 
               <Label htmlFor="statut">Statut *</Label>
               <Select value={statut || ""} onValueChange={(value) => setValue("statut", value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez un statut" />
+              <SelectValue placeholder="Sélectionnez un statut" />
                 </SelectTrigger>
                 <SelectContent>
-                  {statusOptions.map((status) => (
-                <SelectItem key={status.value} value={status.value}>
-                   {status.label}
-                </SelectItem>
-                ))}
+                <SelectItem value="signe">Signé</SelectItem>
+                <SelectItem value="envoye">Envoyé</SelectItem>
+                <SelectItem value="accepte">Accepté</SelectItem>
+                <SelectItem value="refuse">Refusé</SelectItem>
+                <SelectItem value="payes">Payés</SelectItem>
                 </SelectContent>
               </Select>
             </div>
